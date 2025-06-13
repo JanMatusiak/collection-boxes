@@ -35,14 +35,13 @@ public class CollectionBoxService {
         return CollectionBoxesStateDTO.toDTO(boxes);
     }
 
-    public void unregisterBox(Long id){
-        CollectionBox box = collectionBoxRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "No box with ID " + id));
-        box.setAmount(BigDecimal.ZERO);
-        box.setEmpty(true);
-        collectionBoxRepository.save(box);
+    public void unregisterBox(Long id) {
+        if (!collectionBoxRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No box with ID " + id);
+        }
+        collectionBoxRepository.deleteById(id);
     }
+
 
     public void assignBox(Long boxID, Long eventID){
         CollectionBox box = collectionBoxRepository.findById(boxID)
@@ -54,6 +53,14 @@ public class CollectionBoxService {
                         HttpStatus.NOT_FOUND, "No event with ID " + eventID));
 
         box.setEvent(event);
+        collectionBoxRepository.save(box);
+    }
+
+    public void addMoney(Long boxID, BigDecimal amount, String currency){
+        CollectionBox box = collectionBoxRepository.findById(boxID)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "No box with ID " + boxID));
+        box.addAmount(amount, currency);
         collectionBoxRepository.save(box);
     }
 }
