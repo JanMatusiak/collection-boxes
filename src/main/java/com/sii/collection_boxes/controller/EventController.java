@@ -1,9 +1,9 @@
 package com.sii.collection_boxes.controller;
 
-import com.sii.collection_boxes.dto.CreateEventDTO;
+import com.sii.collection_boxes.dto.events.CreateEventDTO;
 import com.sii.collection_boxes.entity.Event;
 import com.sii.collection_boxes.service.EventService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,14 +20,9 @@ public class EventController {
     }
 
     @PostMapping("/createEvent")
-    public ResponseEntity<String> createEvent(@RequestParam String name,
-                                                      @RequestParam String currency){
-        CreateEventDTO dto = new CreateEventDTO(name, currency);
-        Event event = dto.toEvent();
-        eventService.createEvent(event);
-        String msg = String.format("Event created successfully with ID %d", event.getId());
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(msg);
+    public ResponseEntity<String> createEvent(@Valid CreateEventDTO dto){
+        Long id = eventService.createEvent(dto);
+        String msg = String.format("Event %s created successfully with ID %d", dto.getName(), id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(msg);
     }
 }

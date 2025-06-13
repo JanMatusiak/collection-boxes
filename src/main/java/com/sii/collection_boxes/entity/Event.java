@@ -9,9 +9,9 @@ import jakarta.persistence.Id;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String name;
-    String currency;
+    private Long id;
+    private String name;
+    private String currency;
 
     public Event(String name, String currency){
         this.name = name;
