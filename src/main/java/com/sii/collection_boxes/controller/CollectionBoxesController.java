@@ -1,10 +1,14 @@
 package com.sii.collection_boxes.controller;
 
+import com.sii.collection_boxes.dto.boxes.CollectionBoxesStateDTO;
 import com.sii.collection_boxes.service.CollectionBoxService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class CollectionBoxesController {
@@ -19,5 +23,11 @@ public class CollectionBoxesController {
         Long id = collectionBoxService.registerBox();
         String msg = String.format("Box registered successfully with ID %d", id);
         return ResponseEntity.status(HttpStatus.CREATED).body(msg);
+    }
+
+    @GetMapping("/listBoxes")
+    public ResponseEntity<List<CollectionBoxesStateDTO>> listBoxes(){
+        List<CollectionBoxesStateDTO> dtoList = collectionBoxService.listBoxes();
+        return ResponseEntity.ok(dtoList);
     }
 }
