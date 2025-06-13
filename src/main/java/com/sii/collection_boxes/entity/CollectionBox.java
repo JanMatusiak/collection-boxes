@@ -43,4 +43,12 @@ public class CollectionBox {
     public Long getId() {
         return id;
     }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public void setEmpty(boolean empty) {
+        this.empty = empty;
+    }
 }
