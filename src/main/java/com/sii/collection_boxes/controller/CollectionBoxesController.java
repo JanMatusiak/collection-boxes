@@ -4,10 +4,7 @@ import com.sii.collection_boxes.dto.boxes.CollectionBoxesStateDTO;
 import com.sii.collection_boxes.service.CollectionBoxService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,6 +33,14 @@ public class CollectionBoxesController {
     public ResponseEntity<String> unregisterBox(@PathVariable Long id){
         collectionBoxService.unregisterBox(id);
         String msg = String.format("Box with ID %d unregistered successfully", id);
+        return ResponseEntity.ok(msg);
+    }
+
+    @PostMapping("/assignBox/{boxID}")
+    public ResponseEntity<String> assignBox(@PathVariable Long boxID,
+            @RequestParam Long eventID){
+        collectionBoxService.assignBox(boxID, eventID);
+        String msg = String.format("Box with ID %d assigned successfully to event %d", boxID, eventID);
         return ResponseEntity.ok(msg);
     }
 }

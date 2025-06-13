@@ -51,4 +51,9 @@ public class CollectionBox {
     public void setEmpty(boolean empty) {
         this.empty = empty;
     }
+
+    public void setEvent(Event event) {
+        this.event = event;
+        this.assigned = true;
+    }
 }

@@ -13,6 +13,8 @@ public class Event {
     private String name;
     private String currency;
 
+    protected Event(){}
+
     public Event(String name, String currency){
         this.name = name;
         this.currency = currency;
