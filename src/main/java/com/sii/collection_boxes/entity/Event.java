@@ -1,9 +1,8 @@
 package com.sii.collection_boxes.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 
 @Entity
 public class Event {
@@ -13,11 +12,15 @@ public class Event {
     private String name;
     private String currency;
 
+    @Column(precision = 19, scale = 2, nullable = false)
+    private BigDecimal balance;
+
     protected Event(){}
 
     public Event(String name, String currency){
         this.name = name;
         this.currency = currency;
+        this.balance = BigDecimal.ZERO;
     }
 
     public void setName(String name) {
@@ -38,5 +41,13 @@ public class Event {
 
     public Long getId() {
         return id;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
+
+    public void addToBalance(BigDecimal amount){
+        setBalance(this.balance.add(amount));
     }
 }

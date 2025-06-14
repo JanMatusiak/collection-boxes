@@ -53,4 +53,11 @@ public class CollectionBoxesController {
         String msg = String.format("Money added to box with ID %d", boxID);
         return ResponseEntity.ok(msg);
     }
+
+    @PostMapping("/emptyBox/{boxID}")
+    public ResponseEntity<String> emptyBox(@PathVariable Long boxID){
+        collectionBoxService.emptyBox(boxID);
+        String msg = "Money transferred to event";
+        return ResponseEntity.ok(msg);
+    }
 }

@@ -18,12 +18,12 @@ public class CollectionBox {
     @JoinColumn(name = "event_id")
     private Event event;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     @CollectionTable(
-            name = "box_balance",
+            name = "collection_box_balance",
             joinColumns = @JoinColumn(name = "box_id")
     )
-    @MapKeyColumn(name = "currency_code")
+    @MapKeyColumn(name = "currency")
     @Column(name = "amount", precision = 19, scale = 2)
     Map <String, BigDecimal> balance = new HashMap<>();
 
@@ -48,15 +48,19 @@ public class CollectionBox {
         return event;
     }
 
+    public Map<String, BigDecimal> getBalance() {
+        return balance;
+    }
+
+    public BigDecimal getBalance(String currency) {
+        return balance.get(currency);
+    }
+
     public void clearBalance(){
         for (Map.Entry<String, BigDecimal> entry : balance.entrySet()){
             balance.put(entry.getKey(), BigDecimal.ZERO);
             setEmpty(true);
         }
-    }
-
-    public BigDecimal getBalance(String currency) {
-        return balance.get(currency);
     }
 
     public Long getId() {

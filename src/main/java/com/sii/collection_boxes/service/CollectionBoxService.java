@@ -5,12 +5,15 @@ import com.sii.collection_boxes.entity.CollectionBox;
 import com.sii.collection_boxes.entity.Event;
 import com.sii.collection_boxes.repository.CollectionBoxRepository;
 import com.sii.collection_boxes.repository.EventRepository;
+import com.sii.collection_boxes.utility.ExchangeConversion;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CollectionBoxService {
@@ -62,5 +65,31 @@ public class CollectionBoxService {
                         HttpStatus.NOT_FOUND, "No box with ID " + boxID));
         box.addAmount(amount, currency);
         collectionBoxRepository.save(box);
+    }
+
+    @Transactional
+    public void emptyBox(Long boxID){
+        CollectionBox box = collectionBoxRepository.findById(boxID)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "No box with ID " + boxID));
+        Event event = box.getEvent();
+        if (event == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Box not assigned to any event");
+        }
+
+        String currency = event.getCurrency();
+        BigDecimal toTransfer = BigDecimal.ZERO;
+        for (Map.Entry<String, BigDecimal> entry : box.getBalance().entrySet()){
+            if (entry.getKey().equals(currency)){
+                toTransfer = toTransfer.add(box.getBalance(currency));
+            } else {
+                toTransfer = toTransfer.add(CurrencyConversionService.convert(entry.getKey(),
+                        currency, box.getBalance(entry.getKey())));
+            }
+        }
+        event.addToBalance(toTransfer);
+        box.clearBalance();
+        collectionBoxRepository.save(box);
+        eventRepository.save(event);
     }
 }
