@@ -4,6 +4,7 @@ import com.sii.collection_boxes.entity.Event;
 
 public class CreateEventDTO {
     private String name;
+
     private String currency;
 
     public CreateEventDTO(){}

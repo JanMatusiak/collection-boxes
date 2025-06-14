@@ -1,7 +1,6 @@
 package com.sii.collection_boxes.controller;
 
 import com.sii.collection_boxes.dto.CollectionBoxesStateDTO;
-import com.sii.collection_boxes.entity.CollectionBox;
 import com.sii.collection_boxes.service.CollectionBoxService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

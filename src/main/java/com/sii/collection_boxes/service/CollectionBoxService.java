@@ -3,9 +3,11 @@ package com.sii.collection_boxes.service;
 import com.sii.collection_boxes.dto.CollectionBoxesStateDTO;
 import com.sii.collection_boxes.entity.CollectionBox;
 import com.sii.collection_boxes.entity.Event;
+import com.sii.collection_boxes.entity.SupportedCurrencies;
 import com.sii.collection_boxes.repository.CollectionBoxRepository;
 import com.sii.collection_boxes.repository.EventRepository;
 import jakarta.transaction.Transactional;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -54,6 +56,10 @@ public class CollectionBoxService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "No event with ID " + eventID));
 
+        if(box.isAssigned()) {
+            throw new IllegalStateException("Box with ID " + boxID + " is already assigned");
+        }
+
         box.setEvent(event);
         collectionBoxRepository.save(box);
     }
@@ -62,6 +68,10 @@ public class CollectionBoxService {
         CollectionBox box = collectionBoxRepository.findById(boxID)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "No box with ID " + boxID));
+        if (!EnumUtils.isValidEnum(SupportedCurrencies.class, currency)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Unsupported currency: " + currency);
+        }
         box.addAmount(amount, currency);
         collectionBoxRepository.save(box);
     }
