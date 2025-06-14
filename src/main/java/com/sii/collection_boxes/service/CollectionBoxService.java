@@ -57,11 +57,11 @@ public class CollectionBoxService {
                         HttpStatus.NOT_FOUND, "No event with ID " + eventID));
 
         if(box.isAssigned()) {
-            throw new IllegalStateException("Box with ID " + boxID + " is already assigned");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Box with ID " + boxID + " is already assigned");
         }
 
         if(!box.isEmpty()) {
-            throw new IllegalStateException("Box with ID " + boxID + " is not empty");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Box with ID " + boxID + " is not empty");
         }
 
         box.setEvent(event);
@@ -72,9 +72,15 @@ public class CollectionBoxService {
         CollectionBox box = collectionBoxRepository.findById(boxID)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "No box with ID " + boxID));
+        if(!box.isAssigned()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Money cannot be added to an unassigned box");
+        }
         if (!EnumUtils.isValidEnum(SupportedCurrencies.class, currency)) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Unsupported currency: " + currency);
+        }
+        if(amount.compareTo(BigDecimal.ZERO) <= 0){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount added must be positive");
         }
         box.addAmount(amount, currency);
         collectionBoxRepository.save(box);
@@ -88,6 +94,10 @@ public class CollectionBoxService {
         Event event = box.getEvent();
         if (event == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Box not assigned to any event");
+        }
+
+        if(box.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Box is already empty");
         }
 
         String currency = event.getCurrency();
