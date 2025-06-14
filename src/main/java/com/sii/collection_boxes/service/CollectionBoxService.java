@@ -60,6 +60,10 @@ public class CollectionBoxService {
             throw new IllegalStateException("Box with ID " + boxID + " is already assigned");
         }
 
+        if(!box.isEmpty()) {
+            throw new IllegalStateException("Box with ID " + boxID + " is not empty");
+        }
+
         box.setEvent(event);
         collectionBoxRepository.save(box);
     }
