@@ -1,11 +1,10 @@
 package com.sii.collection_boxes.service;
 
-import com.sii.collection_boxes.dto.boxes.CollectionBoxesStateDTO;
+import com.sii.collection_boxes.dto.CollectionBoxesStateDTO;
 import com.sii.collection_boxes.entity.CollectionBox;
 import com.sii.collection_boxes.entity.Event;
 import com.sii.collection_boxes.repository.CollectionBoxRepository;
 import com.sii.collection_boxes.repository.EventRepository;
-import com.sii.collection_boxes.utility.ExchangeConversion;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

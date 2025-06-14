@@ -1,4 +1,4 @@
-package com.sii.collection_boxes.dto.boxes;
+package com.sii.collection_boxes.dto;
 
 import com.sii.collection_boxes.entity.CollectionBox;
 import org.jetbrains.annotations.NotNull;

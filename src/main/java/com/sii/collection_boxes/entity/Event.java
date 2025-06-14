@@ -50,4 +50,8 @@ public class Event {
     public void addToBalance(BigDecimal amount){
         setBalance(this.balance.add(amount));
     }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
 }

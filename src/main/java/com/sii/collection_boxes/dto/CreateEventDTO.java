@@ -1,4 +1,4 @@
-package com.sii.collection_boxes.dto.events;
+package com.sii.collection_boxes.dto;
 
 import com.sii.collection_boxes.entity.Event;
 

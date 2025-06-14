@@ -11,8 +11,6 @@ public class CollectionBox {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private boolean empty;
-    private boolean assigned;
 
     @ManyToOne
     @JoinColumn(name = "event_id")
@@ -28,8 +26,6 @@ public class CollectionBox {
     Map <String, BigDecimal> balance = new HashMap<>();
 
     public CollectionBox(){
-        this.empty = true;
-        this.assigned = false;
         this.event = null;
         this.balance.put("PLN", BigDecimal.ZERO);
         this.balance.put("USD", BigDecimal.ZERO);
@@ -37,11 +33,12 @@ public class CollectionBox {
     }
 
     public boolean isEmpty() {
-        return empty;
+        return balance.values().stream()
+                .allMatch(amount -> amount.compareTo(BigDecimal.ZERO) == 0);
     }
 
     public boolean isAssigned() {
-        return assigned;
+        return event != null;
     }
 
     public Event getEvent() {
@@ -57,10 +54,7 @@ public class CollectionBox {
     }
 
     public void clearBalance(){
-        for (Map.Entry<String, BigDecimal> entry : balance.entrySet()){
-            balance.put(entry.getKey(), BigDecimal.ZERO);
-            setEmpty(true);
-        }
+        balance.replaceAll((currency, amount) -> BigDecimal.ZERO);
     }
 
     public Long getId() {
@@ -69,14 +63,10 @@ public class CollectionBox {
 
     public void addAmount(BigDecimal amount, String currency) {
         this.balance.put(currency, balance.get(currency).add(amount));
-    }
 
-    public void setEmpty(boolean empty) {
-        this.empty = empty;
     }
 
     public void setEvent(Event event) {
         this.event = event;
-        this.assigned = true;
     }
 }

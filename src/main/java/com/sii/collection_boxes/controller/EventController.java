@@ -1,13 +1,11 @@
 package com.sii.collection_boxes.controller;
 
-import com.sii.collection_boxes.dto.events.CreateEventDTO;
-import com.sii.collection_boxes.entity.Event;
+import com.sii.collection_boxes.dto.CreateEventDTO;
 import com.sii.collection_boxes.service.EventService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
