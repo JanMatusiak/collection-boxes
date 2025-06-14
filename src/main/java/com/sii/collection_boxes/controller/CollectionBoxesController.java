@@ -39,9 +39,9 @@ public class CollectionBoxesController {
 
     @PostMapping("/assignBox/{boxID}")
     public ResponseEntity<String> assignBox(@PathVariable Long boxID,
-            @RequestParam Long eventID){
-        collectionBoxService.assignBox(boxID, eventID);
-        String msg = String.format("Box with ID %d assigned successfully to event %d", boxID, eventID);
+            @RequestParam String eventName){
+        collectionBoxService.assignBox(boxID, eventName);
+        String msg = String.format("Box with ID %d assigned successfully to event %s", boxID, eventName);
         return ResponseEntity.ok(msg);
     }
 

@@ -31,7 +31,7 @@ curl -i -X POST "http://localhost:8080/registerBox"
 curl -i -X GET "http://localhost:8080/listBoxes"
 
 ## 4. Assign box #1 to event #1
-curl -i -X POST "http://localhost:8080/assignBox/1?eventID=1"
+curl -i -X POST "http://localhost:8080/assignBox/1?eventName=CharityRun"
 
 ## 5. Add €50 to box #1
 curl -i -X POST "http://localhost:8080/addMoney/1?amount=50&currency=EUR"

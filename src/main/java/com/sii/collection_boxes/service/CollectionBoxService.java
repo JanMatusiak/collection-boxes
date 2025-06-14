@@ -47,14 +47,14 @@ public class CollectionBoxService {
     }
 
 
-    public void assignBox(Long boxID, Long eventID){
+    public void assignBox(Long boxID, String eventName){
         CollectionBox box = collectionBoxRepository.findById(boxID)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "No box with ID " + boxID));
 
-        Event event = eventRepository.findById(eventID)
+        Event event = eventRepository.findByName(eventName)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "No event with ID " + eventID));
+                        HttpStatus.NOT_FOUND, "No event named " + eventName));
 
         if(box.isAssigned()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Box with ID " + boxID + " is already assigned");

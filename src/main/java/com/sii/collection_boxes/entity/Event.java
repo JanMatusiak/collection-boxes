@@ -5,10 +5,11 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
+@Table(name="event",
+        uniqueConstraints=@UniqueConstraint(columnNames="name"))
 public class Event {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(nullable=false, unique = true)
     private String name;
     private String currency;
 
@@ -23,24 +24,12 @@ public class Event {
         this.balance = BigDecimal.ZERO;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
     public String getName() {
         return name;
     }
 
     public String getCurrency() {
         return currency;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public void setBalance(BigDecimal balance) {

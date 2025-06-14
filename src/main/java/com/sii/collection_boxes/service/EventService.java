@@ -23,14 +23,17 @@ public class EventService {
         this.eventRepository = eventRepository;
     }
 
-    public Long createEvent(CreateEventDTO dto){
+    public void createEvent(CreateEventDTO dto){
+        if(eventRepository.existsByName(dto.getName())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "Event name already in use: " + dto.getName());
+        }
         if (!EnumUtils.isValidEnum(SupportedCurrencies.class, dto.getCurrency())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Unsupported currency: " + dto.getCurrency());
         }
         Event event = dto.toEvent();
-        Event saved = eventRepository.save(event);
-        return saved.getId();
+        eventRepository.save(event);
     }
 
     public List<FinancialReportDTO> displayReport(){
