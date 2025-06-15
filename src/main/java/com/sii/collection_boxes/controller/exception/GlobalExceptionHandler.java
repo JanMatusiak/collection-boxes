@@ -19,11 +19,11 @@ public class GlobalExceptionHandler {
     private ResponseEntity<Map<String,Object>> buildErrorResponse(
             String message, String path) {
         Map<String,Object> body = Map.of(
-                "timestamp", Instant.now(),
-                "status", HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "error", HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                 "message", message,
-                "path", path
+                "timestamp", Instant.now(),
+                "error", HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "path", path,
+                "status", HttpStatus.INTERNAL_SERVER_ERROR.value()
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
