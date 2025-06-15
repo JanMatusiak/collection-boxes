@@ -4,6 +4,7 @@ import com.sii.collection_boxes.dto.CollectionBoxesStateDTO;
 import com.sii.collection_boxes.entity.CollectionBox;
 import com.sii.collection_boxes.entity.Event;
 import com.sii.collection_boxes.entity.SupportedCurrencies;
+import com.sii.collection_boxes.exceptions.*;
 import com.sii.collection_boxes.repository.CollectionBoxRepository;
 import com.sii.collection_boxes.repository.EventRepository;
 import jakarta.transaction.Transactional;
@@ -41,47 +42,34 @@ public class CollectionBoxService {
 
     public void unregisterBox(Long id) {
         if (!collectionBoxRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No box with ID " + id);
+            throw new NoSuchBoxException(id);
         }
         collectionBoxRepository.deleteById(id);
     }
 
-
+    @Transactional
     public void assignBox(Long boxID, String eventName){
         CollectionBox box = collectionBoxRepository.findById(boxID)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "No box with ID " + boxID));
+                .orElseThrow(() -> new NoSuchBoxException(boxID));
 
         Event event = eventRepository.findByName(eventName)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "No event named " + eventName));
+                .orElseThrow(() -> new NoSuchEventException(eventName));
 
-        if(box.isAssigned()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Box with ID " + boxID + " is already assigned");
-        }
-
-        if(!box.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Box with ID " + boxID + " is not empty");
-        }
+        if(box.isAssigned()) throw new BoxAlreadyAssignedException(boxID);
+        if(!box.isEmpty()) throw new BoxNotEmptyException(boxID);
 
         box.setEvent(event);
         collectionBoxRepository.save(box);
     }
 
+    @Transactional
     public void addMoney(Long boxID, BigDecimal amount, String currency){
         CollectionBox box = collectionBoxRepository.findById(boxID)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "No box with ID " + boxID));
-        if(!box.isAssigned()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Money cannot be added to an unassigned box");
-        }
-        if (!EnumUtils.isValidEnum(SupportedCurrencies.class, currency)) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Unsupported currency: " + currency);
-        }
-        if(amount.compareTo(BigDecimal.ZERO) <= 0){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount added must be positive");
-        }
+                .orElseThrow(() -> new NoSuchBoxException(boxID));
+        if (!box.isAssigned()) throw new UnassignedBoxException(boxID);
+        if (!EnumUtils.isValidEnum(SupportedCurrencies.class, currency))
+            throw new UnsupportedCurrencyException(currency);
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) throw new NonpositiveAmountException();
         box.addAmount(amount, currency);
         collectionBoxRepository.save(box);
     }
@@ -89,16 +77,10 @@ public class CollectionBoxService {
     @Transactional
     public void emptyBox(Long boxID){
         CollectionBox box = collectionBoxRepository.findById(boxID)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "No box with ID " + boxID));
+                .orElseThrow(() -> new NoSuchBoxException(boxID));
         Event event = box.getEvent();
-        if (event == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Box not assigned to any event");
-        }
-
-        if(box.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Box is already empty");
-        }
+        if (event == null) throw new UnassignedBoxException(boxID);
+        if (box.isEmpty()) throw new BoxAlreadyEmptyException(boxID);
 
         String currency = event.getCurrency();
         BigDecimal toTransfer = BigDecimal.ZERO;

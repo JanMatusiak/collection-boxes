@@ -63,7 +63,6 @@ public class CollectionBox {
 
     public void addAmount(BigDecimal amount, String currency) {
         this.balance.put(currency, balance.get(currency).add(amount));
-
     }
 
     public void setEvent(Event event) {
