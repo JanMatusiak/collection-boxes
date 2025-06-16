@@ -3,6 +3,8 @@ package com.sii.collection_boxes.service;
 import com.sii.collection_boxes.dto.CollectionBoxesStateDTO;
 import com.sii.collection_boxes.entity.CollectionBox;
 import com.sii.collection_boxes.entity.Event;
+import com.sii.collection_boxes.exceptions.NoSuchBoxException;
+import com.sii.collection_boxes.exceptions.NoSuchEventException;
 import com.sii.collection_boxes.repository.CollectionBoxRepository;
 import com.sii.collection_boxes.repository.EventRepository;
 import org.junit.jupiter.api.Test;
@@ -10,15 +12,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CollectionBoxServiceTest {
@@ -70,4 +75,24 @@ public class CollectionBoxServiceTest {
 
         verify(boxRepository).findAll();
     }
+
+    @Test
+    void unregisterBox_deletesByID(){
+        when(boxRepository.existsById(6L)).thenReturn(true);
+        collectionBoxService.unregisterBox(6L);
+        verify(boxRepository).deleteById(6L);
+    }
+
+    @Test
+    void unregisterBox_throws404whenNotFound() {
+        when(boxRepository.existsById(42L)).thenReturn(false);
+        NoSuchBoxException ex = assertThrows(
+                NoSuchBoxException.class,
+                () -> collectionBoxService.unregisterBox(42L)
+        );
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(ex.getReason()).isEqualTo("There is no box with ID 42");
+        verify(boxRepository, never()).deleteById(any());
+    }
+
 }
