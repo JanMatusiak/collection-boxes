@@ -3,6 +3,8 @@ package com.sii.collection_boxes.service;
 import com.sii.collection_boxes.dto.CollectionBoxesStateDTO;
 import com.sii.collection_boxes.entity.CollectionBox;
 import com.sii.collection_boxes.entity.Event;
+import com.sii.collection_boxes.exceptions.BoxAlreadyAssignedException;
+import com.sii.collection_boxes.exceptions.BoxNotEmptyException;
 import com.sii.collection_boxes.exceptions.NoSuchBoxException;
 import com.sii.collection_boxes.exceptions.NoSuchEventException;
 import com.sii.collection_boxes.repository.CollectionBoxRepository;
@@ -93,6 +95,79 @@ public class CollectionBoxServiceTest {
         assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(ex.getReason()).isEqualTo("There is no box with ID 42");
         verify(boxRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void assignBox_setsEvent(){
+        CollectionBox box = new CollectionBox();
+        box.setId(5L);
+        when(boxRepository.findById(5L)).thenReturn(Optional.of(box));
+        Event event = new Event("Redcross", "EUR");
+        when(eventRepository.findByName("Redcross")).thenReturn(Optional.of(event));
+        collectionBoxService.assignBox(5L, "Redcross");
+        assertThat(box.getEvent()).isSameAs(event);
+        verify(boxRepository).save(any(CollectionBox.class));
+    }
+
+    @Test
+    void assignBox_throws404whenBoxNotFound(){
+        when(boxRepository.findById(7L)).thenReturn(Optional.empty());
+        NoSuchBoxException ex = assertThrows(
+                NoSuchBoxException.class,
+                () -> collectionBoxService.assignBox(7L, "Redcross")
+        );
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(ex.getReason()).isEqualTo("There is no box with ID 7");
+        verify(boxRepository, never()).save(any());
+    }
+
+    @Test
+    void assignBox_throws404whenEventNotFound(){
+        CollectionBox box = new CollectionBox();
+        box.setId(7L);
+        when(boxRepository.findById(7L)).thenReturn(Optional.of(box));
+        when(eventRepository.findByName("Redcross")).thenReturn(Optional.empty());
+        NoSuchEventException ex = assertThrows(
+                NoSuchEventException.class,
+                () -> collectionBoxService.assignBox(7L, "Redcross")
+        );
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(ex.getReason()).isEqualTo("There is no event named Redcross");
+        verify(boxRepository, never()).save(any());
+    }
+
+    @Test
+    void assignBox_throws404whenAlreadyAssigned(){
+        CollectionBox box = new CollectionBox();
+        box.setId(7L);
+        box.setEvent(new Event("Caritas","PLN"));
+        when(boxRepository.findById(7L)).thenReturn(Optional.of(box));
+        when(eventRepository.findByName("Redcross"))
+                .thenReturn(Optional.of(new Event("Redcross","EUR")));
+        BoxAlreadyAssignedException ex = assertThrows(
+                BoxAlreadyAssignedException.class,
+                () -> collectionBoxService.assignBox(7L, "Redcross")
+        );
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(ex.getReason()).isEqualTo("Box 7 is already assigned");
+        verify(boxRepository, never()).save(any());
+    }
+
+    @Test
+    void assignBox_throws404whenBoxNotEmpty(){
+        CollectionBox box = new CollectionBox();
+        box.setId(7L);
+        box.addAmount(BigDecimal.valueOf(100), "USD");
+        when(boxRepository.findById(7L)).thenReturn(Optional.of(box));
+        when(eventRepository.findByName("Redcross"))
+                .thenReturn(Optional.of(new Event("Redcross","EUR")));
+        BoxNotEmptyException ex = assertThrows(
+                BoxNotEmptyException.class,
+                () -> collectionBoxService.assignBox(7L, "Redcross")
+        );
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(ex.getReason()).isEqualTo("Box 7 is not empty");
+        verify(boxRepository, never()).save(any());
     }
 
 }
