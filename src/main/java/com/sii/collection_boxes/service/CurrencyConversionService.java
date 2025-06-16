@@ -1,5 +1,6 @@
 package com.sii.collection_boxes.service;
 
+import com.sii.collection_boxes.exceptions.UnsupportedConversionException;
 import com.sii.collection_boxes.exceptions.UnsupportedCurrencyException;
 import com.sii.collection_boxes.utility.ExchangeConversion;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class CurrencyConversionService {
             case "USD_PLN" -> ExchangeConversion.USD_TO_PLN;
             case "USD_EUR" -> ExchangeConversion.USD_TO_EUR;
             case "PLN_PLN", "EUR_EUR", "USD_USD" -> BigDecimal.ONE;
-            default -> throw new UnsupportedCurrencyException(pair);
+            default -> throw new UnsupportedConversionException(pair);
         };
         return amount.multiply(rate);
     }
