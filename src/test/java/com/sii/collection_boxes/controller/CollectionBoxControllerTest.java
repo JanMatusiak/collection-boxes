@@ -38,11 +38,9 @@ public class CollectionBoxControllerTest {
     @Test
     void registerBox_returnsId() throws Exception {
         when(collectionBoxService.registerBox()).thenReturn(42L);
-
         mockMvc.perform(post("/registerBox"))
                 .andExpect(status().isCreated())
                 .andExpect(content().string("Box registered successfully with ID 42"));
-
         verify(collectionBoxService).registerBox();
     }
 

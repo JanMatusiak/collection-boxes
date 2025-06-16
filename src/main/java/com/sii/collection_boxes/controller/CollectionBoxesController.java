@@ -70,6 +70,4 @@ public class CollectionBoxesController {
         String msg = "Money transferred to event";
         return ResponseEntity.ok(msg);
     }
-
-
 }
