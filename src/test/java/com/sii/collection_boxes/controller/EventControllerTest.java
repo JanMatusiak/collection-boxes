@@ -36,7 +36,9 @@ public class EventControllerTest {
 
     @Test
     void createEvent_returnsMessage () throws Exception {
+        // given
         doNothing().when(eventService).createEvent(any(CreateEventDTO.class));
+        // when + then
         mockMvc.perform(post("/createEvent")
                         .param("name", "Redcross")
                         .param("currency", "EUR"))

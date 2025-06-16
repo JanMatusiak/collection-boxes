@@ -32,13 +32,14 @@ public class CurrencyConversionServiceTest {
 
     @ParameterizedTest(name = "{0}→{1} @ rate={2}")
     @MethodSource("currencyPairs")
-    void convert_variousRatesProduceCorrectResult(String from,
-                                                  String to,
+    void convert_variousRatesProduceCorrectResult(String from, String to,
                                                   BigDecimal expectedRate) {
-        BigDecimal amount   = BigDecimal.valueOf(100);
+        // given
+        BigDecimal amount = BigDecimal.valueOf(100);
         BigDecimal expected = amount.multiply(expectedRate);
-        BigDecimal actual   = CurrencyConversionService.convert(from, to, amount);
-
+        // when
+        BigDecimal actual = CurrencyConversionService.convert(from, to, amount);
+        // then
         assertThat(actual)
                 .as("100 * %s→%s rate", from, to)
                 .isEqualByComparingTo(expected);
@@ -46,10 +47,12 @@ public class CurrencyConversionServiceTest {
 
     @Test
     void convert_invalidCurrencyPair() {
+        // given + when
         UnsupportedConversionException ex = assertThrows(
                 UnsupportedConversionException.class,
                 () -> CurrencyConversionService.convert("GBP", "SVK", BigDecimal.valueOf(100))
         );
+        // then
         assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(ex.getReason()).isEqualTo("Unsupported currency conversion: GBP_SVK");
     }

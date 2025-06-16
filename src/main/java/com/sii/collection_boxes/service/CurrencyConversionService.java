@@ -1,7 +1,6 @@
 package com.sii.collection_boxes.service;
 
 import com.sii.collection_boxes.exceptions.UnsupportedConversionException;
-import com.sii.collection_boxes.exceptions.UnsupportedCurrencyException;
 import com.sii.collection_boxes.utility.ExchangeConversion;
 import org.springframework.stereotype.Service;
 

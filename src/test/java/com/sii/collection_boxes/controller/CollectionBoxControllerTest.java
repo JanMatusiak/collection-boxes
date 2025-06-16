@@ -37,7 +37,9 @@ public class CollectionBoxControllerTest {
 
     @Test
     void registerBox_returnsId() throws Exception {
+        //given
         when(collectionBoxService.registerBox()).thenReturn(42L);
+        // when + then
         mockMvc.perform(post("/registerBox"))
                 .andExpect(status().isCreated())
                 .andExpect(content().string("Box registered successfully with ID 42"));
@@ -46,12 +48,13 @@ public class CollectionBoxControllerTest {
 
     @Test
     void listBoxes_returnsBoxDtos() throws Exception {
+        // given
         List<CollectionBoxesStateDTO> dtos = List.of(
                 new CollectionBoxesStateDTO(true, false),
                 new CollectionBoxesStateDTO(false, true)
         );
         when(collectionBoxService.listBoxes()).thenReturn(dtos);
-
+        // when + then
         mockMvc.perform(get("/listBoxes"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -60,13 +63,14 @@ public class CollectionBoxControllerTest {
                 .andExpect(jsonPath("$[0].assigned").value(false))
                 .andExpect(jsonPath("$[1].empty").value(false))
                 .andExpect(jsonPath("$[1].assigned").value(true));
-
         verify(collectionBoxService).listBoxes();
     }
 
     @Test
     void unregisterBox_returnsId() throws Exception {
+        // given
         doNothing().when(collectionBoxService).unregisterBox(7L);
+        // when + then
         mockMvc.perform(delete("/unregisterBox/7"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Box with ID 7 unregistered successfully"));
@@ -75,7 +79,9 @@ public class CollectionBoxControllerTest {
 
     @Test
     void assignBox_returnsMessage() throws Exception {
+        // given
         doNothing().when(collectionBoxService).assignBox(1L, "CharityRun");
+        // when + then
         mockMvc.perform(put("/assignBox/1")
                         .param("eventName", "CharityRun"))
                 .andExpect(status().isOk())
@@ -85,7 +91,9 @@ public class CollectionBoxControllerTest {
 
     @Test
     void addMoney_returnsMessage() throws Exception {
+        // given
         doNothing().when(collectionBoxService).addMoney(2L, BigDecimal.valueOf(50), "EUR");
+        // when + then
         mockMvc.perform(put("/addMoney/2")
                         .param("amount", "50")
                         .param("currency", "EUR"))
@@ -96,7 +104,9 @@ public class CollectionBoxControllerTest {
 
     @Test
     void emptyBox_returnsMessage() throws Exception {
+        // given
         doNothing().when(collectionBoxService).emptyBox(3L);
+        // when + then
         mockMvc.perform(put("/emptyBox/3"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Money transferred to event"));

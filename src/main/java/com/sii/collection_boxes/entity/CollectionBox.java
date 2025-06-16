@@ -54,7 +54,7 @@ public class CollectionBox {
     }
 
     public void clearBalance(){
-        balance.replaceAll((currency, amount) -> BigDecimal.ZERO);
+        balance.replaceAll((_, _) -> BigDecimal.ZERO);
     }
 
     public Long getId() {

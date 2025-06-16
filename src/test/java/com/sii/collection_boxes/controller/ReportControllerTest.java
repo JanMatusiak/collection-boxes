@@ -42,7 +42,7 @@ public class ReportControllerTest {
                 new FinancialReportDTO("FoodDrive",  BigDecimal.valueOf(50), "USD")
         );
         when(eventService.displayReport()).thenReturn(reports);
-
+        // when + then
         mockMvc.perform(get("/generateReport")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -53,7 +53,6 @@ public class ReportControllerTest {
                 .andExpect(jsonPath("$[1].eventName").value("FoodDrive"))
                 .andExpect(jsonPath("$[1].balance").value(50.0))
                 .andExpect(jsonPath("$[1].currency").value("USD"));
-
         verify(eventService).displayReport();
         verifyNoMoreInteractions(eventService);
     }
