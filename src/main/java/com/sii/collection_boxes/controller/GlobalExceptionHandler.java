@@ -1,4 +1,4 @@
-package com.sii.collection_boxes.controller.exception;
+package com.sii.collection_boxes.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -11,8 +11,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(Throwable.class)
-    public ResponseEntity<Map<String,Object>> handleUncaught(Throwable ex, HttpServletRequest req) {
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String,Object>> handleUncaught(RuntimeException ex, HttpServletRequest req) {
         return buildErrorResponse(ex.getMessage(), req.getRequestURI());
     }
 
