@@ -3,10 +3,7 @@ package com.sii.collection_boxes.service;
 import com.sii.collection_boxes.dto.CollectionBoxesStateDTO;
 import com.sii.collection_boxes.entity.CollectionBox;
 import com.sii.collection_boxes.entity.Event;
-import com.sii.collection_boxes.exceptions.BoxAlreadyAssignedException;
-import com.sii.collection_boxes.exceptions.BoxNotEmptyException;
-import com.sii.collection_boxes.exceptions.NoSuchBoxException;
-import com.sii.collection_boxes.exceptions.NoSuchEventException;
+import com.sii.collection_boxes.exceptions.*;
 import com.sii.collection_boxes.repository.CollectionBoxRepository;
 import com.sii.collection_boxes.repository.EventRepository;
 import org.junit.jupiter.api.Test;
@@ -15,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -87,13 +83,13 @@ public class CollectionBoxServiceTest {
 
     @Test
     void unregisterBox_throws404whenNotFound() {
-        when(boxRepository.existsById(42L)).thenReturn(false);
+        when(boxRepository.existsById(7L)).thenReturn(false);
         NoSuchBoxException ex = assertThrows(
                 NoSuchBoxException.class,
-                () -> collectionBoxService.unregisterBox(42L)
+                () -> collectionBoxService.unregisterBox(7L)
         );
         assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(ex.getReason()).isEqualTo("There is no box with ID 42");
+        assertThat(ex.getReason()).isEqualTo("There is no box with ID 7");
         verify(boxRepository, never()).deleteById(any());
     }
 
@@ -170,4 +166,137 @@ public class CollectionBoxServiceTest {
         verify(boxRepository, never()).save(any());
     }
 
+    @Test
+    void addMoney_updatesBalance(){
+        CollectionBox box = new CollectionBox();
+        box.setId(5L);
+        when(boxRepository.findById(5L)).thenReturn(Optional.of(box));
+        Event event = new Event("Redcross", "EUR");
+        when(eventRepository.findByName("Redcross")).thenReturn(Optional.of(event));
+        collectionBoxService.assignBox(5L, "Redcross");
+        clearInvocations(boxRepository);
+        collectionBoxService.addMoney(5L, BigDecimal.valueOf(100), "EUR");
+        assertThat(box.getBalance("EUR")).isEqualTo(BigDecimal.valueOf(100));
+        verify(boxRepository).save(any(CollectionBox.class));
+    }
+
+    @Test
+    void addMoney_throws404whenBoxNotFound(){
+        when(boxRepository.findById(7L)).thenReturn(Optional.empty());
+        NoSuchBoxException ex = assertThrows(
+                NoSuchBoxException.class,
+                () -> collectionBoxService.addMoney(7L, BigDecimal.valueOf(100), "EUR")
+        );
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(ex.getReason()).isEqualTo("There is no box with ID 7");
+        verify(boxRepository, never()).save(any());
+    }
+
+    @Test
+    void addMoney_throws404whenBoxUnassigned() {
+        CollectionBox box = new CollectionBox();
+        box.setId(7L);
+        when(boxRepository.findById(7L)).thenReturn(Optional.of(box));
+        UnassignedBoxException ex = assertThrows(
+                UnassignedBoxException.class,
+                () -> collectionBoxService.addMoney(7L, BigDecimal.valueOf(100), "EUR")
+        );
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(ex.getReason()).isEqualTo("Box 7 is not assigned");
+        verify(boxRepository, never()).save(any());
+    }
+
+    @Test
+    void addMoney_throws404whenUnsupportedCurrency(){
+        CollectionBox box = new CollectionBox();
+        box.setId(7L);
+        when(boxRepository.findById(7L)).thenReturn(Optional.of(box));
+        Event event = new Event("Redcross", "EUR");
+        when(eventRepository.findByName("Redcross")).thenReturn(Optional.of(event));
+        collectionBoxService.assignBox(7L, "Redcross");
+        clearInvocations(boxRepository);
+        UnsupportedCurrencyException ex = assertThrows(
+                UnsupportedCurrencyException.class,
+                () -> collectionBoxService.addMoney(7L, BigDecimal.valueOf(100), "GBP")
+        );
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(ex.getReason()).isEqualTo("Unsupported currency: GBP");
+        verify(boxRepository, never()).save(any());
+    }
+
+    @Test
+    void addMoney_throws404whenNonpositiveAmount(){
+        CollectionBox box = new CollectionBox();
+        box.setId(7L);
+        when(boxRepository.findById(7L)).thenReturn(Optional.of(box));
+        Event event = new Event("Redcross", "EUR");
+        when(eventRepository.findByName("Redcross")).thenReturn(Optional.of(event));
+        collectionBoxService.assignBox(7L, "Redcross");
+        clearInvocations(boxRepository);
+        NonpositiveAmountException ex = assertThrows(
+                NonpositiveAmountException.class,
+                () -> collectionBoxService.addMoney(7L, BigDecimal.valueOf(-100), "EUR")
+        );
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(ex.getReason()).isEqualTo("The value must be positive");
+        verify(boxRepository, never()).save(any());
+    }
+
+    @Test
+    void emptyBox_transfersFunds(){
+        CollectionBox box = new CollectionBox();
+        box.setId(7L);
+        when(boxRepository.findById(7L)).thenReturn(Optional.of(box));
+        Event event = new Event("Redcross", "EUR");
+        when(eventRepository.findByName("Redcross")).thenReturn(Optional.of(event));
+        collectionBoxService.assignBox(7L, "Redcross");
+        collectionBoxService.addMoney(7L, BigDecimal.valueOf(100), "EUR");
+        clearInvocations(boxRepository, eventRepository);
+        collectionBoxService.emptyBox(7L);
+        assertThat(event.getBalance()).isEqualByComparingTo(BigDecimal.valueOf(100));
+        assertThat(box.isEmpty()).isTrue();
+        verify(boxRepository).save(any(CollectionBox.class));
+        verify(eventRepository).save(any());
+    }
+
+    @Test
+    void emptyBox_throws404whenBoxNotFound(){
+        when(boxRepository.findById(7L)).thenReturn(Optional.empty());
+        NoSuchBoxException ex = assertThrows(
+                NoSuchBoxException.class,
+                () -> collectionBoxService.emptyBox(7L));
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(ex.getReason()).isEqualTo("There is no box with ID 7");
+        verify(boxRepository, never()).save(any());
+    }
+
+    @Test
+    void emptyBox_throws404whenBoxUnassigned(){
+        CollectionBox box = new CollectionBox();
+        box.setId(7L);
+        when(boxRepository.findById(7L)).thenReturn(Optional.of(box));
+        UnassignedBoxException ex = assertThrows(
+                UnassignedBoxException.class,
+                () -> collectionBoxService.emptyBox(7L));
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(ex.getReason()).isEqualTo("Box 7 is not assigned");
+        verify(boxRepository, never()).save(any());
+    }
+
+    @Test
+    void emptyBox_throws404whenBoxAlreadyEmpty(){
+        CollectionBox box = new CollectionBox();
+        box.setId(7L);
+        when(boxRepository.findById(7L)).thenReturn(Optional.of(box));
+        Event event = new Event("Redcross", "EUR");
+        when(eventRepository.findByName("Redcross")).thenReturn(Optional.of(event));
+        collectionBoxService.assignBox(7L, "Redcross");
+        clearInvocations(boxRepository, eventRepository);
+        BoxAlreadyEmptyException ex = assertThrows(
+                BoxAlreadyEmptyException.class,
+                () -> collectionBoxService.emptyBox(7L));
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(ex.getReason()).isEqualTo("Box 7 is already empty");
+        verify(boxRepository, never()).save(any());
+    }
 }
