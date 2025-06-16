@@ -68,4 +68,8 @@ public class CollectionBox {
     public void setEvent(Event event) {
         this.event = event;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

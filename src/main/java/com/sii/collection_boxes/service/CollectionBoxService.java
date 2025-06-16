@@ -9,9 +9,7 @@ import com.sii.collection_boxes.repository.CollectionBoxRepository;
 import com.sii.collection_boxes.repository.EventRepository;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.EnumUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
