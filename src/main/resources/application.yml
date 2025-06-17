@@ -1,23 +1,37 @@
+# application.yml
+
 spring:
   application:
     name: collection-boxes
-
-  jackson:
-    serialization:
-      indent_output: true
-
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
     username: sa
     password:
-
   h2:
     console:
       enabled: true
       path: /h2-console
+  jackson:
+    serialization:
+      indent_output: true
+  server:
+    error:
+      include-message: always
 
-server:
-  error:
-    include-message: always
+conversion:
+  static:
+    enabled: true
 
+---
+spring:
+  config:
+    activate:
+      on-profile: live-rates
+
+conversion:
+  static:
+    enabled: false
+
+exchangerate:
+  api-key: ${EXCHANGERATE_API_KEY}

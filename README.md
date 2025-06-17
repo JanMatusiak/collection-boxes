@@ -10,18 +10,30 @@ A Spring Boot application to manage fundraising events and donation boxes.
 
 ## Getting Started
 
+### Profiles
+
+By default, the service uses built-in (constant) currency rates.
+For real‐time conversions, a key from https://www.exchangerate-api.com/ must be generated.
+
 ```bash
 git clone https://github.com/JanMatusiak/collection-boxes
 cd collection-boxes
 
-### Using the Maven wrapper (included in the project)
-./mvnw clean package
-### Run via Spring Boot plugin
+# constant (static) rates (default)
 ./mvnw spring-boot:run
-
-### —or— run the packaged JAR
+# —or—
 java -jar target/collection-boxes-0.1.0.jar
-## 1. Create a new fundraising event
+
+# live (external API) rates
+export EXCHANGERATE_API_KEY=your_real_api_key_here
+./mvnw spring-boot:run \
+  -Dspring-boot.run.profiles=live-rates
+# —or—
+export EXCHANGERATE_API_KEY=your_real_api_key_here
+java -jar target/collection-boxes-0.1.0.jar \
+  --spring.profiles.active=live-rates
+
+## 1. Create a new event
 curl -i -X POST "http://localhost:8080/createEvent?name=CharityRun&currency=EUR"
 
 ## 2. Register a new empty box

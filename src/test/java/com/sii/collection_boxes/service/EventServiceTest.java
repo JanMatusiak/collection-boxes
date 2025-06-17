@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
@@ -32,6 +33,9 @@ public class EventServiceTest {
 
     @InjectMocks
     EventService eventService;
+
+    @Spy
+    ConversionService conversionService = new ConstantConversionService();
 
     @Test
     void createEvent_savesNewEvent() {

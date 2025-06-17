@@ -13,18 +13,19 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class CollectionBoxService {
 
     CollectionBoxRepository collectionBoxRepository;
     EventRepository eventRepository;
+    private final ConversionService conversionService;
 
     public CollectionBoxService(CollectionBoxRepository collectionBoxRepository,
-                                EventRepository eventRepository){
+                                EventRepository eventRepository, ConversionService conversionService){
         this.collectionBoxRepository = collectionBoxRepository;
         this.eventRepository = eventRepository;
+        this.conversionService = conversionService;
     }
 
     public Long registerBox(){
@@ -80,16 +81,21 @@ public class CollectionBoxService {
         if (event == null) throw new UnassignedBoxException(boxID);
         if (box.isEmpty()) throw new BoxAlreadyEmptyException(boxID);
 
-        String currency = event.getCurrency();
+        String targetCurrency = event.getCurrency();
         BigDecimal toTransfer = BigDecimal.ZERO;
-        for (Map.Entry<String, BigDecimal> entry : box.getBalance().entrySet()){
-            if (entry.getKey().equals(currency)){
-                toTransfer = toTransfer.add(box.getBalance(currency));
+
+        for (var entry : box.getBalance().entrySet()) {
+            String boxCurrency = entry.getKey();
+            BigDecimal boxAmount = entry.getValue();
+
+            if (boxCurrency.equals(targetCurrency)) {
+                toTransfer = toTransfer.add(boxAmount);
             } else {
-                toTransfer = toTransfer.add(CurrencyConversionService.convert(entry.getKey(),
-                        currency, box.getBalance(entry.getKey())));
+                BigDecimal rate = conversionService.getRate(boxCurrency, targetCurrency);
+                toTransfer = toTransfer.add(boxAmount.multiply(rate));
             }
         }
+
         event.addToBalance(toTransfer);
         box.clearBalance();
         collectionBoxRepository.save(box);
