@@ -1,6 +1,7 @@
 package com.sii.collection_boxes.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,11 +13,11 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String,Object>> handleUncaught(RuntimeException ex, HttpServletRequest req) {
+    public ResponseEntity<Map<String,Object>> handleUncaught(@NotNull RuntimeException ex, @NotNull HttpServletRequest req) {
         return buildErrorResponse(ex.getMessage(), req.getRequestURI());
     }
 
-    private ResponseEntity<Map<String,Object>> buildErrorResponse(
+    private @NotNull ResponseEntity<Map<String,Object>> buildErrorResponse(
             String message, String path) {
         Map<String,Object> body = Map.of(
                 "message", message,
