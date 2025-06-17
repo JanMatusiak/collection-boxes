@@ -44,3 +44,13 @@ curl -i -X DELETE "http://localhost:8080/unregisterBox/1"
 
 ## 8. Display financial report
 curl -i -X GET "http://localhost:8080/generateReport"
+
+```
+## Test Strategy
+
+- **Service-Layer Unit Tests**  
+  - Pure unit tests for all `*Service` classes. This gives rapid, targeted feedback on business-logic methods.
+
+- **Controller-Layer Slice Tests**  
+  - MockMvc-driven slice tests for all `*Controller` classes. This ensures our REST endpoints are wired up correctly (status codes, JSON payloads, error handling) without spinning up the full Spring context.
+
