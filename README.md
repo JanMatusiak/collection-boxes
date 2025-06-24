@@ -13,24 +13,24 @@ A Spring Boot application to manage fundraising events and donation boxes.
 ### Profiles
 
 By default, the service uses built-in (constant) currency rates.
-For real‐time conversions, a key from https://www.exchangerate-api.com/ must be generated.
+For real‐time conversions, an API key from https://www.exchangerate-api.com/ must be generated.
 
 ```bash
 git clone https://github.com/JanMatusiak/collection-boxes
 cd collection-boxes
 
-# constant (static) rates (default)
+# constant rates (default)
 ./mvnw spring-boot:run
-# —or—
-java -jar target/collection-boxes-0.1.0.jar
+# or
+java -jar target/collection-boxes-*.jar
 
-# live (external API) rates
-export EXCHANGERATE_API_KEY=your_real_api_key_here
+# live rates
+export EXCHANGERATE_API_KEY=your_generated_key_here
 ./mvnw spring-boot:run \
   -Dspring-boot.run.profiles=live-rates
-# —or—
-export EXCHANGERATE_API_KEY=your_real_api_key_here
-java -jar target/collection-boxes-0.1.0.jar \
+# or
+export EXCHANGERATE_API_KEY=your_generated_key_here
+java -jar target/collection-boxes-*.jar \
   --spring.profiles.active=live-rates
 
 ## 1. Create a new event

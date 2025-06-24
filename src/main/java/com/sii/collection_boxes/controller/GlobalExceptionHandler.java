@@ -12,7 +12,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
-    ResponseEntity<Map<String,Object>> handleUncaught(RuntimeException ex, HttpServletRequest req) {
+    public ResponseEntity<Map<String,Object>> handleUncaught(RuntimeException ex, HttpServletRequest req) {
         return buildErrorResponse(ex.getMessage(), req.getRequestURI());
     }
 
