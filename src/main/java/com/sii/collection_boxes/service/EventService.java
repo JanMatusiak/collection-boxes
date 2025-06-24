@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Service
 public class EventService {
 
-    EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
     public EventService(EventRepository eventRepository){
         this.eventRepository = eventRepository;

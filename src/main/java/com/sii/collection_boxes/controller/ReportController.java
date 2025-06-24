@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 public class ReportController {
+
     private final EventService eventService;
 
     public ReportController(EventService eventService){

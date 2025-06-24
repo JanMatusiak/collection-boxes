@@ -23,7 +23,7 @@ public class CollectionBoxesController {
     }
 
     @PostMapping("/registerBox")
-    public ResponseEntity<String> registerBox(){
+    ResponseEntity<String> registerBox(){
         Long id = collectionBoxService.registerBox();
         log.info("Box registered successfully with ID {}", id);
         String msg = String.format("Box registered successfully with ID %d", id);

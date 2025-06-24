@@ -12,7 +12,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.math.BigDecimal;
 
 @Service
-@EnableScheduling
 @Profile("live-rates")
 public class LiveConversionService implements ConversionService {
     private final WebClient client;

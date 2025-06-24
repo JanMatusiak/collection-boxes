@@ -17,8 +17,8 @@ import java.util.List;
 @Service
 public class CollectionBoxService {
 
-    CollectionBoxRepository collectionBoxRepository;
-    EventRepository eventRepository;
+    private final CollectionBoxRepository collectionBoxRepository;
+    private final EventRepository eventRepository;
     private final ConversionService conversionService;
 
     public CollectionBoxService(CollectionBoxRepository collectionBoxRepository,
