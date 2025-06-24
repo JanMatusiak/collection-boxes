@@ -94,7 +94,7 @@ public class CollectionBoxControllerTest {
         // given
         doNothing().when(collectionBoxService).addMoney(2L, BigDecimal.valueOf(50), "EUR");
         // when + then
-        mockMvc.perform(put("/addMoney/2")
+        mockMvc.perform(post("/addMoney/2")
                         .param("amount", "50")
                         .param("currency", "EUR"))
                 .andExpect(status().isOk())

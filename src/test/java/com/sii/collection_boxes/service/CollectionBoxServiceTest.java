@@ -33,9 +33,6 @@ public class CollectionBoxServiceTest {
     @Mock
     EventRepository eventRepository;
 
-    @Spy
-    ConversionService conversionService = new ConstantConversionService();
-
     @InjectMocks
     CollectionBoxService collectionBoxService;
 

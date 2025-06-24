@@ -34,35 +34,27 @@ java -jar target/collection-boxes-0.1.0.jar \
   --spring.profiles.active=live-rates
 
 ## 1. Create a new event
-curl -i -X POST "http://localhost:8080/createEvent?name=CharityRun&currency=EUR"
+curl -i -X POST "http://localhost:8080/events?name=CharityRun&currency=EUR"
 
 ## 2. Register a new empty box
-curl -i -X POST "http://localhost:8080/registerBox"
+curl -i -X POST "http://localhost:8080/box"
 
 ## 3. List all boxes (shows only empty/assigned flags)
-curl -i -X GET "http://localhost:8080/listBoxes"
+curl -i -X GET "http://localhost:8080/box"
 
 ## 4. Assign box #1 to event #1
-curl -i -X PUT "http://localhost:8080/assignBox/1?eventName=CharityRun"
+curl -i -X PUT "http://localhost:8080/box/1/assign?eventName=CharityRun"
 
 ## 5. Add €50 to box #1
-curl -i -X PUT "http://localhost:8080/addMoney/1?amount=50&currency=EUR"
+curl -i -X POST "http://localhost:8080/box/1/add?amount=50&currency=EUR"
 
 ## 6. Empty box #1 (transfer its funds into the event account)
-curl -i -X PUT "http://localhost:8080/emptyBox/1"
+curl -i -X PUT "http://localhost:8080/box/1/empty"
 
 ## 7. Unregister box #1 (remove it from the database)
-curl -i -X DELETE "http://localhost:8080/unregisterBox/1"
+curl -i -X DELETE "http://localhost:8080/box/1"
 
 ## 8. Display financial report
-curl -i -X GET "http://localhost:8080/generateReport"
+curl -i -X GET "http://localhost:8080/report"
 
 ```
-## Test Strategy
-
-- **Service-Layer Unit Tests**  
-  - Pure unit tests for all `*Service` classes. This gives rapid, targeted feedback on business-logic methods.
-
-- **Controller-Layer Slice Tests**  
-  - MockMvc-driven slice tests for all `*Controller` classes. This ensures our REST endpoints are wired up correctly (status codes, JSON payloads, error handling) without spinning up the full Spring context.
-

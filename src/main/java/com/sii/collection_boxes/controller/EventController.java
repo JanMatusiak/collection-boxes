@@ -6,12 +6,14 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RestController
+@RequestMapping("/events")
 public class EventController {
 
     private final EventService eventService;
@@ -21,8 +23,8 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    @PostMapping("/createEvent")
-    public ResponseEntity<String> createEvent(@Valid CreateEventDTO dto){
+    @PostMapping
+    ResponseEntity<String> createEvent(@Valid CreateEventDTO dto){
         eventService.createEvent(dto);
         log.info("Event {} created successfully", dto.name());
         String msg = String.format("Event %s created successfully", dto.name());

@@ -34,9 +34,6 @@ public class EventServiceTest {
     @InjectMocks
     EventService eventService;
 
-    @Spy
-    ConversionService conversionService = new ConstantConversionService();
-
     @Test
     void createEvent_savesNewEvent() {
         // given
