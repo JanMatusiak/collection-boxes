@@ -1,10 +1,10 @@
 # Collection-Boxes Service
 
-A Spring Boot application to manage fundraising events and donation boxes.
+A Spring Boot application to manage fundraising events and collection boxes.
 
 ## Prerequisites
 
-- Java 17+ (written on Java 24)
+- latest version of Java (written in Java 24)
 - Git
 - Maven (wrapper included)
 
@@ -58,3 +58,7 @@ curl -i -X DELETE "http://localhost:8080/box/1"
 curl -i -X GET "http://localhost:8080/report"
 
 ```
+
+## Testing strategy
+Unit tests were performed for both the controller and service layer.  
+For controller tests, I used MockMvc class to mock the full Spring MVC request handling without actually starting a server.  
