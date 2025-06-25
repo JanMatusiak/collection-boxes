@@ -62,3 +62,5 @@ curl -i -X GET "http://localhost:8080/report"
 ## Testing strategy
 Unit tests were performed for both the controller and service layer.  
 For controller tests, I used MockMvc class to mock the full Spring MVC request handling without actually starting a server.  
+I have not implemented a test to check the value returned by LiveCurrencyConversionService, as it would be impossible to check it against a real fixed value.
+Instead, I mocked the HTTP call, preloaded a response and verified that a getRate call returns this response.
