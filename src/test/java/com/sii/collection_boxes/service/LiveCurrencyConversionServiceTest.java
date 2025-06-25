@@ -1,5 +1,6 @@
 package com.sii.collection_boxes.service;
 
+import com.sii.collection_boxes.dto.RatesResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,8 +45,8 @@ public class LiveCurrencyConversionServiceTest {
         doReturn(headersSpec).when(uriSpec).uri("/v6/{key}/pair/{from}/{to}", "TEST_KEY", "EUR", "USD");
 
         when(headersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(LiveConversionService.PairResponse.class))
-                .thenReturn(Mono.just(new LiveConversionService.PairResponse("success", BigDecimal.TEN)));
+        when(responseSpec.bodyToMono(RatesResponseDTO.class))
+                .thenReturn(Mono.just(new RatesResponseDTO("success", BigDecimal.TEN)));
 
         liveConversionService = new LiveConversionService(builder, "TEST_KEY");
     }

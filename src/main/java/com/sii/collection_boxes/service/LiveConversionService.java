@@ -23,27 +23,23 @@ public class LiveConversionService implements ConversionService {
         this.apiKey = apiKey;
     }
 
-    public record PairResponse(
-            @JsonProperty("result") String result,
-            @JsonProperty("conversion_rate") BigDecimal conversionRate
-    ) {}
-
     @Override
     public BigDecimal getRate(@NotNull String from, String to) {
         if (from.equals(to)) {
             return BigDecimal.ONE;
         }
 
-        PairResponse pairResponse = client.get()
+        RatesResponseDTO dto = client.get()
                 .uri("/v6/{key}/pair/{from}/{to}", apiKey, from, to)
                 .retrieve()
-                .bodyToMono(PairResponse.class)
+                .bodyToMono(RatesResponseDTO.class)
                 .block();
 
-        if (!"success".equals(pairResponse.result())) {
+        assert dto != null;
+        if (!"success".equals(dto.result())) {
             String pair = from + '_' + to;
             throw new UnsupportedConversionException(pair);
         }
-        return pairResponse.conversionRate();
+        return dto.conversionRate();
     }
 }
