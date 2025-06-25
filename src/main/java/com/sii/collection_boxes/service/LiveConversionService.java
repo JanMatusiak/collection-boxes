@@ -1,6 +1,5 @@
 package com.sii.collection_boxes.service;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sii.collection_boxes.dto.RatesResponseDTO;
 import com.sii.collection_boxes.exceptions.UnsupportedConversionException;
 import org.jetbrains.annotations.NotNull;
